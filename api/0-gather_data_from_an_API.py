@@ -1,30 +1,45 @@
 #!/usr/bin/python3
 """ Geeting data from an API """
-import json
 import requests
-import sys
+
+API_ENDPOINT = "https://example.com/api/todos/{employee_id}"
+
+def get_employee_todo_list_progress(employee_id):
+   response = requests.get(API_ENDPOINT.format(employee_id=employee_id))
+   
+   if response.status_code != 200:
+     raise Exception("Failed to get employee TODO list progress: {}".format(response.status_code))
+   
+   json_response = response.json()
+   
+   number_of_done_tasks = 0
+   total_number_of_tasks = 0
+   
+   for task in json_response["tasks"]:
+    if task["status"] == "done":
+      number_of_done_tasks += 1
+    total_number_of_tasks += 1
+    
+    return{
+    "employee_name": json_response["employee_name"],
+    "number_of_done_tasks": number_of_done_tasks,
+    "total_number_of_tasks": total_number_of_tasks,
+    }
+
+
+def main():
+  employee_id = int(input("Enter the employee ID: "))
+  employee_todo_list_progress = get_employee_todo_list_progress(employee_id)
+  
+  print("Employee {} is done with tasks({}/{}):".format(
+      employee_todo_list_progress["employee_name"],
+      employee_todo_list_progress["number_of_done_tasks"],
+      employee_todo_list_progress["total_number_of_tasks"],
+      ))
+  
+  for task in employee_todo_list_progress["completed_tasks"]:
+    print("\t{}".format(task))
+
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(f"missing employee id as argument")
-        sys.exit(1)
-
-    URL = "https://jsonplaceholder.typicode.com"
-    EMPLOYEE_ID = sys.argv[1]
-
-    EMPLOYEE_TODOS = requests.get(f"{URL}/users/{EMPLOYEE_ID}/todos",
-                                  params={"_expand": "user"})
-    data = EMPLOYEE_TODOS.json()
-
-    EMPLOYEE_NAME = data[0]["user"]["name"]
-    TOTAL_NUMBER_OF_TASKS = len(data)
-    NUMBER_OF_DONE_TASKS = 0
-    TASK_TITLE = []
-    for task in data:
-        if task["completed"]:
-            NUMBER_OF_DONE_TASKS += 1
-            TASK_TITLE.append(task["title"])
-    print(f"Employee {EMPLOYEE_NAME} is done with tasks"
-          f"({NUMBER_OF_DONE_TASKS}/{TOTAL_NUMBER_OF_TASKS}):")
-    for title in TASK_TITLE:
-        print("\t ", title)
+  main()
