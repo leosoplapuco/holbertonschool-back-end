@@ -5,6 +5,7 @@ import sys
 
 API_URL = 'https://jsonplaceholder.typicode.com'
 
+
 def get_employee_todo_progress(user_id):
     user_response = requests.get(f"{API_URL}/users/{user_id}")
     tasks_response = requests.get(f"{API_URL}/todos?userId={user_id}")
@@ -26,6 +27,7 @@ def get_employee_todo_progress(user_id):
 
     for task in completed_tasks:
         print(f"\t{task['title']}")
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
