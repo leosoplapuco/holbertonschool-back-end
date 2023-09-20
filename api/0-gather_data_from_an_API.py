@@ -1,18 +1,35 @@
 #!/usr/bin/python3
-"""gets api"""
+""" Getting data from an API """
 import requests
-from sys import argv
+import sys
 
+API_URL = 'https://jsonplaceholder.typicode.com'
 
-def todo(userid):
-    name = requests.get('https://jsonplaceholder.typicode.com/users/{}'.format(userid)).json().get('name')
-    tasks = requests.get('https://jsonplaceholder.typicode.com/users/{}/todos'.format(userid)).json()
-    tasksDone = ['\t {}\n'.format(dic.get('title')) for dic in tasks if dic.get('completed')]
-    if name and tasks:
-        print("Employee {} is done with tasks({}/{}):".format(name, len(tasksDone), len(tasks)))
-        print(''.join(tasksDone), end='')
+def get_employee_todo_progress(user_id):
+    user_response = requests.get(f"{API_URL}/users/{user_id}")
+    tasks_response = requests.get(f"{API_URL}/todos?userId={user_id}")
 
+    if user_response.status_code != 200 or tasks_response.status_code != 200:
+        print("Failed to retrieve data from the API.")
+        return
 
-if __name__ == "__main__":
-    if len(argv) == 2:
-        todo(int(argv[1]))
+    user_data = user_response.json()
+    tasks_data = tasks_response.json()
+
+    username = user_data.get('name')
+    completed_tasks = [task for task in tasks_data if task.get('completed')]
+
+    total_tasks = len(tasks_data)
+    num_completed_tasks = len(completed_tasks)
+
+    print(f"Employee {username} is done with tasks ({num_completed_tasks}/{total_tasks}):")
+
+    for task in completed_tasks:
+        print(f"\t{task['title']}")
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <user_id>")
+    else:
+        user_id = int(sys.argv[1])
+        get_employee_todo_progress(user_id)
