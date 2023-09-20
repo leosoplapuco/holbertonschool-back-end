@@ -5,6 +5,7 @@ import sys
 
 API_URL = 'https://jsonplaceholder.typicode.com'
 
+
 def get_employee_todo_progress(user_id):
     user_response = requests.get(f"{API_URL}/users/{user_id}")
     tasks_response = requests.get(f"{API_URL}/todos?userId={user_id}")
