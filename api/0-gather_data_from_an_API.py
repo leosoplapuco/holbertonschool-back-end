@@ -1,45 +1,41 @@
 #!/usr/bin/python3
-""" Getting data form an API """
+"""
+This module makes a request to an API to extract specific data
+"""
 import requests
-import sys
+from sys import argv
 
-def get_employee_todo_progress(employee_id):
-    base_url = 'https://jsonplaceholder.typicode.com'
 
-    # Make requests to get user and task data
-    user_response = requests.get(f'{base_url}/users/{employee_id}')
-    tasks_response = requests.get(f'{base_url}/todos?userId={employee_id}')
+url = 'https://jsonplaceholder.typicode.com'
 
-    # Check if the user request was successful
-    if user_response.status_code != 200:
-        print(f'Failed to retrieve user data. Status code: {user_response.status_code}')
-        return
+# Acceso a la API
+response = requests.get(url)
 
-    # Check if the tasks request was successful
-    if tasks_response.status_code != 200:
-        print(f'Failed to retrieve task data. Status code: {tasks_response.status_code}')
-        return
 
-    # Extract user name and task data
-    user_data = user_response.json()
-    tasks_data = tasks_response.json()
+def make_request():
+    # Hacer las solicitudes para obtener los datos de la API
+    response_tasks = requests.get(f"{url}/todos?userId={argv[1]}")
+    response_user = requests.get(f"{url}/users/{argv[1]}")
 
-    # Calculate the number of completed tasks and total tasks
-    completed_tasks = [task for task in tasks_data if task['completed']]
-    num_completed_tasks = len(completed_tasks)
-    total_tasks = len(tasks_data)
+    # Convertir de JSON a estrucutura de datos
+    all_task = response_tasks.json()
+    username = response_user.json().get('name')
 
-    # Display the information in the specified format
-    print(f'Employee {user_data["name"]} is done with tasks({num_completed_tasks}/{total_tasks}):')
+    # Lista de tareas completadas por el usuario x
+    completed_tasks = []
+    for task in all_task:
+        if task.get('completed'):
+            completed_tasks.append(task)
+
+    print("Employee {} is done with tasks({}/{}):".format(
+        username,
+        len(completed_tasks),
+        len(all_task))
+        )
+
     for task in completed_tasks:
-        print(f'\t{task["title"]}')
+        print(f"\t {task.get('title')}")
+
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Usage: python script.py <employee_id>')
-    else:
-        try:
-            employee_id = int(sys.argv[1])
-            get_employee_todo_progress(employee_id)
-        except ValueError:
-            print('Employee ID must be an integer.')
+    make_request()
