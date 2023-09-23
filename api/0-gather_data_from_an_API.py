@@ -23,7 +23,7 @@ def get_todo_list_progress(employee_id: int) -> str:
     todos = todos_response.json()
 
     to_len = len(todos)
-    
+
     completed_todos = []
 
     for todo in todos:
