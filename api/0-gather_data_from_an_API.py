@@ -1,5 +1,7 @@
+#!/usr/bin/python3
 import requests
 import sys
+""" Getting data from an API """
 
 def get_employee_name(employee_id):
   url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
