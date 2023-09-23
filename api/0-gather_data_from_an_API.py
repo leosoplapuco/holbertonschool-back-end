@@ -1,33 +1,15 @@
 #!/usr/bin/python3
-"""
-To retrieve data from an API
-"""
+""" Getting data from an API """
+import requests
+import sys
 
-if __name__ == '__main__':
 
-    import requests
-    from sys import argv
-
+if __name__ == "__main__":
     url = "https://jsonplaceholder.typicode.com/"
-    param = argv[1]
-    user = requests.get(url + "users?id={}".format(param))
-    # Transforms JSON data in Python objects
-    user = user.json()
-    # Gets the name from the user object
-    name = user[0]["name"]
-    todos = requests.get(url + "todos?userId={}".format(param))
-    # Transforms JSON data in Python objects
-    todos = todos.json()
-    done = requests.get(url + "todos?userId={}&completed=true".format(param))
-    # Transforms JSON data in Python objects
-    done = done.json()
-    done_list = []
+    user = requests.get(url + "users/{}".format(sys.argv[1])).json()
+    todos = requests.get(url + "todos", params={"userId": sys.argv[1]}).json()
 
-    print("Employee {} is done with tasks({}/{}):"
-          .format(name, len(done), len(todos)))
-
-    # n is a dictionary and title is the key
-    for n in done:
-        done_list.append("\t {}".format(n["title"]))
-    for task in done_list:
-        print(task)
+    completed = [t.get("title") for t in todos if t.get("completed") is True]
+    print("Employee {} is done with tasks({}/{}):".format(
+        user.get("name"), len(completed), len(todos)))
+    [print("\t {}".format(c)) for c in completed]
