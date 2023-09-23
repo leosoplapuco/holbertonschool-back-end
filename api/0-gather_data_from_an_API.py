@@ -1,49 +1,31 @@
 #!/usr/bin/python3
 """ Getting data from an API """
-import requests
-import sys
-
-
-API = 'https://jsonplaceholder.typicode.com'
-
-
-endpoints = {
-        "users": f"{API}/users",
-        "todos": f"{API}/todos"
-        }
-
-
-def get_todo_list_progress(employee_id: int) -> str:
-    get_employee_endpoint = f"{endpoints['users']}/{employee_id}"
-    employee_response = requests.get(get_employee_endpoint)
-    employee = employee_response.json()
-
-    get_employee_todos_endpoint = f"{endpoints['todos']}?userId={employee_id}"
-    todos_response = requests.get(get_employee_todos_endpoint)
-    todos = todos_response.json()
-
-    to_len = len(todos)
-
-    completed_todos = []
-
-    for todo in todos:
-        if todo["completed"] is True:
-            completed_todos.append(todo)
-    com_to_qu = len(completed_todos)
-
-    text = "is done with tasks"
-    first_line = f"Employee {employee['name']} {text}({com_to_qu}/{to_len}):\n"
-
-    next_line = ''
-    for completed_todo in completed_todos:
-        next_line = next_line + "\t " + completed_todo["title"] + "\n"
-
-    return first_line + next_line
-
 
 if __name__ == '__main__':
-    employee_id = sys.argv[1]
 
-    output = get_todo_list_progress(employee_id)
+    import requests
+    from sys import argv
 
-    print(output, end="")
+    url = "https://jsonplaceholder.typicode.com/"
+    param = argv[1]
+    user = requests.get(url + "users?id={}".format(param))
+    # Transforms JSON data in Python objects
+    user = user.json()
+    # Gets the name from the user object
+    name = user[0]["name"]
+    todos = requests.get(url + "todos?userId={}".format(param))
+    # Transforms JSON data in Python objects
+    todos = todos.json()
+    done = requests.get(url + "todos?userId={}&completed=true".format(param))
+    # Transforms JSON data in Python objects
+    done = done.json()
+    done_list = []
+
+    print("Employee {} is done with tasks({}/{}):"
+          .format(name, len(done), len(todos)))
+
+    # n is a dictionary and title is the key
+    for n in done:
+        done_list.append("\t {}".format(n["title"]))
+    for task in done_list:
+        print(task)
