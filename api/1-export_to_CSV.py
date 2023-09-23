@@ -1,20 +1,23 @@
 #!/usr/bin/python3
-""" Importing modules """
-import csv
-import requests
-from sys import argv
+""" Gettinf data from and API """
 
 if __name__ == '__main__':
-    url_users = requests.get('https://jsonplaceholder.typicode.com/users')
-    url_todos = requests.get('https://jsonplaceholder.typicode.com/todos')
 
-    for i in url_users.json():
-        if i['id'] == int(argv[1]):
-            username = i['username']
-    with open(f"{argv[1]}.csv", 'w') as f:
-        for i in url_todos.json():
-            if i['userId'] == int(argv[1]):
-                completed = i['completed']
-                title = i['title']
-                f.write("\"{}\",\"{}\",\"{}\",\"{}\"\n".
-                        format(argv[1], username, completed, title))
+    import csv
+    import requests
+    from sys import argv
+
+    param = argv[1]
+    csv_path = "{}.csv".format(param)
+    url = "https://jsonplaceholder.typicode.com/"
+    user = requests.get(url + "users?id={}".format(param))
+    user = user.json()
+    name = user[0]["username"]
+    todos = requests.get(url + "todos?userId={}".format(param))
+    todos = todos.json()
+
+    with open(csv_path, mode="w", newline="") as file:
+        writer = csv.writer(file, delimiter=',', quoting=csv.QUOTE_ALL)
+
+        for todo in todos:
+            writer.writerow([param, name, todo["completed"], todo["title"]])
