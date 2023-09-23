@@ -1,56 +1,44 @@
-#!/usr/bin/python3
-"""
-script that returns the user and a
-list of total tasks and completed tasks
-"""
 import requests
 import sys
 
-
-API = 'https://jsonplaceholder.typicode.com'
-
-
-endpoints = {
-        "users": f"{API}/users",
-        "todos": f"{API}/todos"
-        }
-
-
-def get_todo_list_progress(employee_id: int) -> str:
-    """We get the employee with id employee_id"""
-    get_employee_endpoint = f"{endpoints['users']}/{employee_id}"
-    employee_response = requests.get(get_employee_endpoint)
-    employee = employee_response.json()
-
-    """We get the list of tasks of the employee with id employee_id"""
-    get_employee_todos_endpoint = f"{endpoints['todos']}?userId={employee_id}"
-    todos_response = requests.get(get_employee_todos_endpoint)
-    todos = todos_response.json()
-
-    to_len = len(todos)
-
-    """We filter the tasks to get the list
-    of completed and uncompleted tasks"""
-    completed_todos = []
-
-    for todo in todos:
-        if todo["completed"] is True:
-            completed_todos.append(todo)
-    com_to_qu = len(completed_todos)
-
-    text = "is done with tasks"
-    first_line = f"Employee {employee['name']} {text}({com_to_qu}/{to_len}):\n"
-
-    next_line = ''
-    for completed_todo in completed_todos:
-        next_line = next_line + "\t " + completed_todo["title"] + "\n"
-
-    return first_line + next_line
+def get_employee_name(employee_id):
+  url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
+  response = requests.get(url)
+  
+  if response.status_code == 200:
+    user = response.json()
+    return user.get("name")
+  else:
+    return None
 
 
-if __name__ == '__main__':
-    employee_id = sys.argv[1]
+def get_employee_todo_list_progress(employee_id):
+  url = "https://jsonplaceholder.typicode.com/todos"
+  params = {"userId": employee_id}
+  response = requests.get(url, params=params)
 
-    output = get_todo_list_progress(employee_id)
+  if response.status_code == 200:
+    todos = response.json()
+    completed = [t.get("title") for t in todos if t.get("completed") is True]
+    return {
+      "completed_tasks": completed,
+      "total_number_of_tasks": len(todos),
+      }
+  else:
+    return {}
 
-    print(output, end="")
+
+if __name__ == "__main__":
+  employee_id = sys.argv[1]
+  employee_name = get_employee_name(employee_id)
+
+  if employee_name is not None:
+    employee_todo_list_progress = get_employee_todo_list_progress(employee_id)
+    completed = employee_todo_list_progress["completed_tasks"]
+    total_number_of_tasks = employee_todo_list_progress["total_number_of_tasks"]
+
+    print("Employee {} is done with tasks({}/{}):".format(
+        employee_name, len(completed), total_number_of_tasks))
+    [print("\t {}".format(c)) for c in completed]
+  else:
+    print("Employee with ID {} does not exist.".format(employee_id))
