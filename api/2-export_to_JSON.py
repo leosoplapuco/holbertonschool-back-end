@@ -1,27 +1,23 @@
 #!/usr/bin/python3
-""" Gettinf data from and API """
+""" Importing data """
+import json
+import requests
+import sys
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    URL = "https://jsonplaceholder.typicode.com"
+    EMPLOYEE_ID = sys.argv[1]
 
-    import json
-    import requests
-    from sys import argv
+    EMPLOYEE_TODOS = requests.get(f"{URL}/users/{EMPLOYEE_ID}/todos",
+                                  params={"_expand": "user"})
+    data = EMPLOYEE_TODOS.json()
 
-    url = "https://jsonplaceholder.typicode.com/"
-    param = argv[1]
-    user = requests.get(url + "users?id={}".format(param))
-    user = user.json()
-    name = user[0]["username"]
-    todos = requests.get(url + "todos?userId={}".format(param))
-    todos = todos.json()
-    output = {}
-    output[param] = []
-
-    for todo in todos:
-        output[param].append({
-            "task": todo["title"],
-            "completed": todo["completed"],
-            "username": name})
-
-    with open("{}.json".format(param), 'w') as result_file:
-        json.dump(output, result_file)
+    username = data[0]["user"]["username"]
+    USER_TASK = {EMPLOYEE_ID: []}
+    for task in data:
+        dic_task = {"task": task["title"], "completed": task["completed"],
+                    "username": username}
+        USER_TASK[EMPLOYEE_ID].append(dic_task)
+    fileName = f"{EMPLOYEE_ID}.json"
+    with open(fileName, "w") as file:
+        json.dump(USER_TASK, file)
