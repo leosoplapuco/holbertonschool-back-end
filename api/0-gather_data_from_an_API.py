@@ -2,6 +2,8 @@
 import requests
 import sys
 
+""" Using an ApiREST to fetch data """
+
 if __name__ == '__main__':
 
     id = sys.argv[1]
