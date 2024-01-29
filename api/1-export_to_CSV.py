@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+
+"""   Getting data and export to a CSV file   """
+
 import csv
 import requests
 import sys

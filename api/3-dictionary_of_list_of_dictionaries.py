@@ -3,6 +3,8 @@ import json
 import requests
 import sys
 
+"""   Dictionary of list of dictionaries   """
+
 if __name__ == '__main__':
     url = "https://jsonplaceholder.typicode.com"
     user_u = requests.get(f"{url}/users")

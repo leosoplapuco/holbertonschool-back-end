@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""   Using an ApiREST to fetch data   """
+"""   Gather data from and API  """
 
 import requests
 import sys
