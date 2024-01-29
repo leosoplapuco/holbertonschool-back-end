@@ -1,8 +1,9 @@
 #!/usr/bin/python3
+
+"""   Using an ApiREST to fetch data   """
+
 import requests
 import sys
-
-""" Using an ApiREST to fetch data """
 
 if __name__ == '__main__':
 
