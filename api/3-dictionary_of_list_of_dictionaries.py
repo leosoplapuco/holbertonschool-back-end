@@ -1,9 +1,10 @@
 #!/usr/bin/python3
+
+"""   Dictionary of list of dictionaries   """
+
 import json
 import requests
 import sys
-
-"""   Dictionary of list of dictionaries   """
 
 if __name__ == '__main__':
     url = "https://jsonplaceholder.typicode.com"
