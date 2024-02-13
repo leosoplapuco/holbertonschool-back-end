@@ -17,7 +17,7 @@ if __name__ == '__main__':
     todos = "https://jsonplaceholder.typicode.com/todos/"
     res_task = requests.get(todos).json()
     for i in res_task:
-        if i.get('userId') == int(id):
+        if i.get('USER_ID') == int(id):
             if i.get('completed') is True:
                 task_title.append(i['title'])
                 complete += 1
