@@ -1,28 +1,34 @@
 #!/usr/bin/python3
-
-"""   Gather data from and API  """
+"""   Geeting data from an API with Pyton3   """
 
 import requests
 import sys
 
-if __name__ == '__main__':
 
-    id = sys.argv[1]
-    task_title = []
-    complete = 0
-    total = 0
-    url_user = "https://jsonplaceholder.typicode.com/users/" + id
-    result = requests.get(url_user).json()
-    name = result.get('name')
-    todos = "https://jsonplaceholder.typicode.com/todos/"
-    res_task = requests.get(todos).json()
-    for i in res_task:
-        if i.get('userId') == int(id):
-            if i.get('completed') is True:
-                task_title.append(i['title'])
-                complete += 1
-            total += 1
-    print("Employee {} is done with tasks({}/{}):"
-          .format(name, complete, total))
-    for x in task_title:
-        print("\t {}".format(x))
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(f"UsageError: python3 {__file__} employee_id(int)")
+        sys.exit(1)
+
+    API_URL = "https://jsonplaceholder.typicode.com"
+    EMPLOYEE_ID = sys.argv[1]
+
+    response = requests.get(
+        f"{API_URL}/users/{EMPLOYEE_ID}/todos",
+        params={"_expand": "user"}
+    )
+    data = response.json()
+
+    if not len(data):
+        print("RequestError:", 404)
+        sys.exit(1)
+
+    employee_name = data[0]["user"]["name"]
+    total_tasks = len(data)
+    done_tasks = [task for task in data if task["completed"]]
+    total_done_tasks = len(done_tasks)
+
+    print(f"Employee {employee_name} is done with tasks"
+          f"({total_done_tasks}/{total_tasks}):")
+    for task in done_tasks:
+        print(f"\t {task['title']}")
